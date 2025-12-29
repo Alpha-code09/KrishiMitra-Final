@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Star, Send, CheckCircle2, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import API_BASE from "../config/api"
 
 interface FeedbackProps {
   darkMode: boolean;
@@ -138,8 +139,6 @@ export default function Feedback({ darkMode, language }: FeedbackProps) {
 
   const t = content[language];
 
-  const API_BASE = (import.meta as any)?.env?.VITE_API_BASE || 'http://localhost:8080/api';
-
   const getRatingMessage = (stars: number, lang: 'en' | 'hi') => {
     const messages = {
       en: {
@@ -171,7 +170,7 @@ export default function Feedback({ darkMode, language }: FeedbackProps) {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE}/feedback`, {
+      const response = await fetch(`${API_BASE}/api/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

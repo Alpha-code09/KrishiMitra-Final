@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { BarChart3, TrendingUp, Users, MessageSquare, Star, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import API_BASE from "../config/api";
 
 interface AnalyticsProps {
   darkMode: boolean;
@@ -69,11 +70,11 @@ export default function Analytics({ darkMode, language }: AnalyticsProps) {
   const fetchAnalytics = async () => {
     setIsLoading(true);
     try {
-      const API_BASE = (import.meta as any)?.env?.VITE_API_BASE || 'http://localhost:8080/api/feedback';
-      const response = await fetch(`${API_BASE}/analytics`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
+    const response = await fetch(`${API_BASE}/api/feedback/analytics`, {
+     method: 'GET',
+     headers: { 'Content-Type': 'application/json' },
+    });
+
 
       if (response.ok) {
         const data = await response.json();

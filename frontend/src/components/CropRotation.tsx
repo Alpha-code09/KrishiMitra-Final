@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { RefreshCw, Sprout, Loader2, CheckCircle2 } from 'lucide-react';
+import API_BASE from "../config/api";
 
 interface CropRotationProps {
   darkMode: boolean;
@@ -14,7 +15,6 @@ type CropField =
   | "humidity"
   | "ph"
   | "rainfall";
-
 
 export default function CropRotation({ darkMode, language }: CropRotationProps) {
   const [formData, setFormData] = useState({
@@ -59,12 +59,12 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   console.log("Sending payload:", payload);  // Debug
 
-  try {
-    const response = await fetch("http://localhost:8080/api/recommend-crop", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+try {
+  const response = await fetch(`${API_BASE}/api/recommend-crop`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
 
     if (!response.ok) throw new Error("Failed to get crop recommendations");
 

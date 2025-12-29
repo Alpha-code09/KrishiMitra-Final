@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Upload, X, CheckCircle, AlertCircle, Loader2, Leaf, Droplet } from 'lucide-react';
 import { toast } from 'sonner';
+import API_BASE from "../config/api"
 
 interface CropDiseaseDetectionProps {
   darkMode: boolean;
@@ -28,8 +29,6 @@ export default function CropDiseaseDetection({ darkMode, language }: CropDisease
   const [result, setResult] = useState<DiseaseResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const apiBaseUrl = (import.meta as any).env.VITE_API_BASE || 'http://localhost:8080/api';
 
   const t = {
     en: {
@@ -128,7 +127,7 @@ export default function CropDiseaseDetection({ darkMode, language }: CropDisease
       const formData = new FormData();
       formData.append('image', selectedFile);
 
-      const response = await fetch(`${apiBaseUrl}/disease/detect`, {
+      const response = await fetch(`${API_BASE}/api/disease/detect`, {
         method: 'POST',
         body: formData,
       });

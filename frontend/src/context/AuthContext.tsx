@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import API_BASE from "../config/api";
 
 interface User {
   id?: string;
@@ -29,7 +30,8 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-const API_BASE = (import.meta as any)?.env?.VITE_API_BASE || 'http://localhost:8080/api';
+// const API_BASE = (import.meta as any)?.env?.VITE_API_BASE || 'http://localhost:8080/api';
+
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(() => {
@@ -62,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   async function login(email: string, password: string) {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/farmer/login`, {
+      const res = await fetch(`${API_BASE}/api/farmer/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

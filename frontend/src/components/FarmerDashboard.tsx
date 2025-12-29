@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { User, Mail, MapPin, Leaf, TrendingUp, MessageSquare, Award, LogOut, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
+import API_BASE from "../config/api"
 
 interface FarmerDashboardProps {
   darkMode: boolean;
@@ -88,7 +89,6 @@ export default function FarmerDashboard({ darkMode, language }: FarmerDashboardP
     setApiError(null);
     setFieldErrors({});
     try {
-      const API_BASE = (import.meta as any)?.env?.VITE_API_BASE || 'http://localhost:8080/api';
       const token = localStorage.getItem('token');
 
       const email = auth?.user?.email || '';
@@ -101,7 +101,7 @@ export default function FarmerDashboard({ darkMode, language }: FarmerDashboardP
 
       console.log('Fetching data for email:', email);
       
-      const response = await fetch(`${API_BASE}/farmer/dashboard?email=${encodeURIComponent(email)}`, {
+      const response = await fetch(`${API_BASE}/api/farmer/dashboard?email=${encodeURIComponent(email)}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
