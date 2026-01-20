@@ -61,38 +61,65 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
-  async function login(email: string, password: string) {
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/farmer/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-console.log(data)
-      if (!res.ok) throw new Error(data?.message || 'Login failed');
-      const t = data.token || data.accessToken || null;
-      setToken(t);
+  // async function login(email: string, password: string) {
+  //   setLoading(true);
+  //   try {
+  //     const res = await fetch(`${API_BASE}/api/farmer/login`, {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ email, password }),
+  //     });
+  //     const data = await res.json();
 
-      // Derive a user object from several possible backend response shapes.
-      // Some backends return { user } or { userInfo }, others may return the
-      // DTO (e.g. FarmerLoginDto) containing `email` and optionally `name`.
-      let userFromResponse: any = null;
-      if (data.user) userFromResponse = data.user;
-      else if (data.userInfo) userFromResponse = data.userInfo;
-      else if (data.email) userFromResponse = { email: data.email, name: data.name };
-      setUser(userFromResponse);
-      // Note: we intentionally do not store raw passwords even if returned.
-    } finally {
-      setLoading(false);
+  //     if (!res.ok) throw new Error(data?.message || 'Login failed');
+  //     const t = data.token || data.accessToken || null;
+  //     setToken(t);
+
+  //     // Derive a user object from several possible backend response shapes.
+  //     // Some backends return { user } or { userInfo }, others may return the
+  //     // DTO (e.g. FarmerLoginDto) containing `email` and optionally `name`.
+  //     let userFromResponse: any = null;
+  //     if (data.user) userFromResponse = data.user;
+  //     else if (data.userInfo) userFromResponse = data.userInfo;
+  //     else if (data.email) userFromResponse = { email: data.email, name: data.name };
+  //     setUser(userFromResponse);
+  //     // Note: we intentionally do not store raw passwords even if returned.
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
+  async function login(email: string, password: string) {
+  setLoading(true)
+  try {
+    const res = await fetch(`${API_BASE}/api/farmer/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      throw new Error(data?.message || 'Login failed')
     }
+
+    // ✅ Backend returns FarmerDto directly
+    setUser(data)
+    localStorage.setItem('user', JSON.stringify(data))
+
+    // ❌ NO TOKEN (remove completely)
+    setToken(null)
+
+  } finally {
+    setLoading(false)
   }
+}
+
 
   async function signup(payload: SignupPayload) {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/farmer/signup`, {
+      const res = await fetch(`${API_BASE}/api/farmer/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

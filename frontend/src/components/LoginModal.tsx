@@ -3,6 +3,7 @@ import { X, Mail, Lock, User, Phone, MapPin, Leaf, ArrowRight, CheckCircle2 } fr
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
+import API_BASE from "../config/api";
 
 interface LoginModalProps {
   show: boolean;
@@ -149,74 +150,88 @@ export default function LoginModal({ show, onClose, darkMode, language, onAuthSu
     }
   }, [show]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setFieldErrors(null);
-    setSuccess(null);
-    setLoading(true);
+//  const handleSubmit = async (e: React.FormEvent) => {
+//   e.preventDefault()
+//   setLoading(true)
+//   setError(null)
+//   setSuccess(null)
+//   try {
+//     if (isLogin) {
+//   await auth.login(formData.email, formData.password)
+//   setSuccess('Login successful')
+//   onClose()
+//   }
 
-    try {
-      if (isLogin) {
-        await auth.login(formData.email, formData.password);
-        setSuccess('Logged in successfully');
-        toast.success(language === 'en' ? 'Login successful! Welcome back.' : 'लॉगिन सफल! आपका स्वागत है।');
-        if (onAuthSuccess) onAuthSuccess({ token: auth.token || '', user: auth.user });
-        setTimeout(() => {
-          setLoading(false);
-          onClose();
-        }, 500);
-      } else {
-        // Signup - all fields except optional ones are required
-        if (!formData.name || !formData.email || !formData.password) {
-          throw new Error(language === 'en' ? 'Please fill in all required fields' : 'कृपया सभी आवश्यक फ़ील्ड भरें');
-        }
+//     else {
+//       // 📝 SIGNUP (FIXED ENDPOINT)
+//       const res = await fetch(`${API_BASE}/api/farmer/signup`, {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({
+//           name: formData.name,
+//           email: formData.email,
+//           password: formData.password,
+//           phoneNumber: formData.phoneNumber,
+//           location: formData.location,
+//           farmSize: formData.farmSize,
+//           joinedDate: formData.joinedDate,
+//         }),
+//       })
 
-        await auth.signup({
+//       const data = await res.json()
+//       if (!res.ok) throw new Error(data.message || 'Signup failed')
+
+//       setSuccess('Account created successfully! Please login.')
+//       setIsLogin(true)
+//     }
+//   } catch (err: any) {
+//     setError(err.message || 'Something went wrong')
+//   } finally {
+//     setLoading(false)
+//   }
+// }
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setLoading(true)
+  setError(null)
+  setSuccess(null)
+
+  try {
+    if (isLogin) {
+      // ✅ LOGIN via AuthContext
+      await auth.login(formData.email, formData.password)
+      setSuccess('Login successful')
+      onClose()
+    } else {
+      // ✅ SIGNUP
+      const res = await fetch(`${API_BASE}/api/farmer/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           name: formData.name,
           email: formData.email,
           password: formData.password,
-          location: formData.location || undefined,
-          phoneNumber: formData.phoneNumber || undefined,
-          farmSize: formData.farmSize || undefined,
-          joinedDate: formData.joinedDate || undefined,
-        });
+          phoneNumber: formData.phoneNumber,
+          location: formData.location,
+          farmSize: formData.farmSize,
+          joinedDate: formData.joinedDate,
+        }),
+      })
 
-        setSuccess('Account created');
-        toast.success(language === 'en' ? 'Account created successfully! Signing you in...' : 'खाता सफलतापूर्वक बनाया गया! साइन इन हो रहे हैं...');
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Signup failed')
 
-        setTimeout(() => {
-          if (auth.token) {
-            if (onAuthSuccess) onAuthSuccess({ token: auth.token || '', user: auth.user });
-            onClose();
-          } else {
-            setFormData({
-              name: '',
-              email: '',
-              password: '',
-              location: '',
-              phoneNumber: '',
-              farmSize: '',
-              joinedDate: '',
-            });
-            setIsLogin(true);
-            setSuccess(null);
-            setLoading(false);
-          }
-        }, 700);
-      }
-    } catch (err: any) {
-      console.error(err);
-      const errorMsg = err?.message || 'An error occurred';
-      // If backend provided field-level errors, surface them
-      if (err?.fieldErrors && typeof err.fieldErrors === 'object') {
-        setFieldErrors(err.fieldErrors);
-      }
-      setError(errorMsg);
-      toast.error(errorMsg);
-      setLoading(false);
+      setSuccess('Account created successfully! Please login.')
+      setIsLogin(true)
     }
-  };
+  } catch (err: any) {
+    setError(err.message || 'Something went wrong')
+  } finally {
+    setLoading(false)
+  }
+}
+
 
   return (
     <>
